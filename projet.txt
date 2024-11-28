@@ -1,0 +1,22 @@
+SDD 1003
+Projet final (40 points)
+Vous êtes vivement encouragé à réaliser ce projet individuellement
+Consignes :
+a. Pour votre projet final, créez un site web en utilisant Node.js (pour JavaScript) et MongoDB, ou bien Flask (pour Python) et MongoDB. Utilisez la base de données que vous avez téléchargée sur Kaggle.
+Note: Les images suivantes sont uniquement pour vous donner une idée de la fonctionnalité de votre site web. Vous êtes libres de choisir le design et la manière de concevoir votre site web.
+Note : Vous êtes libre d'utiliser les modèles ('Template') HTML ou JavaScript comme point de départ pour votre projet.
+b. Les fonctionnalités attendues de votre site web:
+1- Recherche (5 points) :
+L'utilisateur doit pouvoir effectuer une recherche sur votre site, comme illustré dans l'exemple ci-dessous à gauche. Adaptez cet exemple à votre base de données provenant de Kaggle. Par exemple, permettez à l'utilisateur d'entrer le nombre de chambres à coucher souhaité ('bedrooms'), ainsi que le nombre de nuits minimum ('minimum_nights') et maximum ('maximum_nights') que la personne peut rester dans l'Airbnb.
+Une fois que l'utilisateur clique sur le bouton "Vérifier la disponibilité", votre site doit afficher une liste, comme celle illustrée dans l'image à droite, montrant les maisons ou chambres disponibles en fonction des critères sélectionnés.
+2- Mise à jour et Supprimer (10 points) :
+L'utilisateur doit pouvoir effectuer une recherche, par exemple dans le cas de la base de données Airbnb, sur le champ 'name' comme indiqué dans l'image suivante (à gauche). Ensuite, une page doit afficher les informations recherchées par l'utilisateur (à droite), où celui-ci peut mettre à jour ou supprimer les informations trouvées.
+3- Graphiques (6 points):
+En utilisant votre base de données, créez trois graphiques différents (par exemple, un diagramme en barres, un graphique en lignes et un histogramme) pour explorer les données de la collection. Voir l'exemple de démonstration suivant :
+4- Algorithmes D'apprentissage Automatique (6 points) :
+Appliquez des algorithmes d'apprentissage automatique tels que la régression linéaire, KNN et un algorithme de votre choix aux données de votre base de données, et visualisez les résultats séparément. Voir l'exemple de démonstration suivant (6 points):
+5- Classification d'un Document dans la Base de Données (8 points):
+De manière similaire à l'exercice 2, l'utilisateur doit pouvoir effectuer une recherche dans la base de données, par exemple sur le champ name dans l'exemple de la base de données Airbnb, comme illustré dans l'image suivante. À droite, on doit voir le résultat d'un des algorithmes utilisés dans la question 4 qui classifie l'individu ou le document.
+Par exemple, l'algorithme pourrait déterminer si la personne (représentée comme un "document" dans MongoDB) est diabétique ou si elle a un cancer.
+d) Veuillez créer un fichier zip contenant votre code avec des commentaires, et le téléverser sur le PORTAIL de COURS
+e) Vous devez présenter votre code 12 décembre 2024 (5 points).
