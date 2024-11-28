@@ -81,7 +81,7 @@
             width: 55%;
         }
 
-        input[type="text"], input[type="number"] {
+        input[type="text"], input[type="number"], input[type="checkbox"], select {
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -111,7 +111,7 @@
     <div class="container">
         <div class="sidebar">
             <button class="toggle-button" onclick="toggleForm('searchForm')">Search</button>
-            <button class="toggle-button" onclick="toggleForm('updateForm')">Update</button>
+            <button class="toggle-button" onclick="toggleForm('searchUpdateForm')">Search for Update</button>
             <button class="toggle-button" onclick="toggleForm('deleteForm')">Delete</button>
             <button class="toggle-button" onclick="toggleForm('graphsForm')">Graphs</button>
             <button class="toggle-button" onclick="toggleForm('mlForm')">Machine Learning</button>
@@ -119,30 +119,36 @@
         </div>
         <div class="content">
             <div>
-                <h1>Welcome to the Flask App</h1>
+                <h1>Bienvenu à ce projet d'une valeur de 100%</h1>
             </div>
 
             <form id="searchForm" action="/search" method="get">
-                <label for="room_type">Room Type:</label>
-                <input type="text" id="room_type" name="room_type"><br>
                 <label for="min_nights">Minimum Nights:</label>
                 <input type="number" id="min_nights" name="min_nights"><br>
-                <label for="max_price">Maximum Price:</label>
-                <input type="number" id="max_price" name="max_price"><br>
+                <label for="neighbourhood_group">Neighbourhood Group:</label>
+                <select id="neighbourhood_group" name="neighbourhood_group">
+                    <option value="Bronx">Bronx</option>
+                    <option value="Brooklyn">Brooklyn</option>
+                    <option value="Manhattan">Manhattan</option>
+                    <option value="Queens">Queens</option>
+                    <option value="Staten Island">Staten Island</option>
+                    <option value="brookln">brookln</option>
+                    <option value="manhatan">manhatan</option>
+                </select><br>
+                <label for="instant_bookable">Instant Bookable:</label>
+                <input type="checkbox" id="instant_bookable" name="instant_bookable"><br>
                 <button type="submit">Search</button>
             </form>
 
-            <form id="updateForm" action="/update" method="post">
-                <label for="id">ID:</label>
-                <input type="text" id="id" name="id"><br>
-                <label for="new_data">New Data (JSON format):</label>
-                <input type="text" id="new_data" name="new_data"><br>
-                <button type="submit">Update</button>
+            <form id="searchUpdateForm" action="/search_update" method="get">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required><br>
+                <button type="submit">Search for Update</button>
             </form>
 
             <form id="deleteForm" action="/delete" method="post">
-                <label for="id">ID:</label>
-                <input type="text" id="id" name="id"><br>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name"><br>
                 <button type="submit">Delete</button>
             </form>
 

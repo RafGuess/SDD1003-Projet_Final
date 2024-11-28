@@ -13,49 +13,66 @@ client = MongoClient('mongodb+srv://aguess1874:Alex.1874@cluster0.mr9n5.mongodb.
 db = client['AirBnB']
 collection = db['AirBnB']
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
 
-
 # Fonctionnalité de recherche
 @app.route('/search', methods=['GET'])
 def search():
-    room_type = request.args.get('room_type')
     min_nights = request.args.get('min_nights')
-    max_price = request.args.get('max_price')
+    neighbourhood_group = request.args.get('neighbourhood_group')
+    instant_bookable = request.args.get('instant_bookable')
 
-    query = {}
-    if room_type:
-        query['room type'] = room_type
+    query = {'price': {'$exists': True, '$ne': ''}}
     if min_nights:
-        query['minimum nights'] = {'$lte': int(min_nights)}
-    if max_price:
-        query['price'] = {'$lte': float(max_price)}
+        query['minimum nights'] = {'$gte': int(min_nights)}
+    if neighbourhood_group:
+        query['neighbourhood group'] = neighbourhood_group
+    if instant_bookable:
+        query['instant_bookable'] = True
 
-    results = list(collection.find(query, {'_id': 0, 'NAME': 1, 'price': 1, 'room type': 1, 'minimum nights': 1}))
+    results = list(collection.find(query, {'_id': 0, 'NAME': 1, 'price': 1, 'minimum nights': 1, 'instant_bookable': 1, 'neighbourhood group': 1}).sort('price', 1))
     return jsonify(results)
 
-
 # Fonctionnalité de mise à jour
-@app.route('/update/<id>', methods=['PUT'])
-def update(id):
-    new_data = request.json
-    result = collection.update_one({'_id': ObjectId(id)}, {'$set': new_data})
+@app.route('/search_update', methods=['GET'])
+def search_update():
+    name = request.args.get('name')
+    query = {'price': {'$exists': True, '$ne': ''}}
+    if name:
+        query['NAME'] = name
+
+    result = collection.find_one(query, {'_id': 1, 'NAME': 1, 'price': 1, 'minimum nights': 1, 'instant_bookable': 1, 'neighbourhood group': 1})
+    if result:
+        return render_template('update.html', result=result)
+    return jsonify({'error': 'Document non trouvé'}), 404
+
+@app.route('/update', methods=['POST'])
+def update():
+    document_id = request.form.get('id')
+    new_data = {}
+    if request.form.get('price'):
+        new_data['price'] = request.form.get('price')
+    if request.form.get('min_nights'):
+        new_data['minimum nights'] = int(request.form.get('min_nights'))
+    if request.form.get('instant_bookable'):
+        new_data['instant_bookable'] = request.form.get('instant_bookable') == 'on'
+    if request.form.get('neighbourhood_group'):
+        new_data['neighbourhood group'] = request.form.get('neighbourhood_group')
+
+    result = collection.update_one({'_id': ObjectId(document_id)}, {'$set': new_data})
     if result.modified_count:
         return jsonify({'message': 'Mise à jour réussie'})
     return jsonify({'error': 'Échec de la mise à jour'}), 400
 
-
-# Fonctionnalité de suppression
-@app.route('/delete/<id>', methods=['DELETE'])
-def delete(id):
-    result = collection.delete_one({'_id': ObjectId(id)})
+@app.route('/delete', methods=['POST'])
+def delete():
+    name = request.json.get('name')
+    result = collection.delete_one({'NAME': name})
     if result.deleted_count:
         return jsonify({'message': 'Suppression réussie'})
     return jsonify({'error': 'Échec de la suppression'}), 400
-
 
 # Fonctionnalité de graphiques
 @app.route('/graphs')
@@ -69,6 +86,7 @@ def graphs():
     plt.close()
 
     plt.figure(figsize=(10, 6))
+    data['price'] = data['price'].apply(lambda x: float(x.replace('$', '').strip()))
     data['price'].plot(kind='hist', bins=50)
     plt.title('Distribution des prix')
     plt.savefig('static/price_hist.png')
@@ -82,11 +100,11 @@ def graphs():
 
     return jsonify({'message': 'Graphiques créés'})
 
-
 # Algorithmes de machine learning
 @app.route('/ml')
 def ml():
     data = pd.DataFrame(list(collection.find({}, {'price': 1, 'minimum nights': 1, 'number of reviews': 1, '_id': 0})))
+    data['price'] = data['price'].apply(lambda x: float(x.replace('$', '').strip()))
     X = data[['minimum nights', 'number of reviews']]
     y = data['price']
 
@@ -103,20 +121,18 @@ def ml():
 
     return jsonify({'message': 'Machine learning appliqué'})
 
-
 # Classification de document
 @app.route('/classify/<id>', methods=['GET'])
 def classify(id):
     document = collection.find_one({'_id': ObjectId(id)})
     if document:
-        price = document.get('price', 0)
+        price = float(document.get('price', '0').replace('$', '').strip())
         if price > 100:
             classification = 'Cher'
         else:
             classification = 'Abordable'
         return jsonify({'id': str(document['_id']), 'NAME': document.get('NAME', ''), 'classification': classification})
     return jsonify({'error': 'Document non trouvé'}), 404
-
 
 if __name__ == '__main__':
     app.run(debug=True)

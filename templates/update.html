@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #5a7e53;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #253821;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        input[type="text"], input[type="number"], input[type="checkbox"], select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            background-color: #5a7e53;
+            color: #253821;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #486745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Update Document</h1>
+        <form id="updateForm" action="/update" method="post">
+            <input type="hidden" id="id" name="id" value="{{ result['_id'] }}">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ result['NAME'] }}" readonly><br>
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="price" value="{{ result['price'] }}"><br>
+            <label for="min_nights">Minimum Nights:</label>
+            <input type="number" id="min_nights" name="min_nights" value="{{ result['minimum nights'] }}"><br>
+            <label for="instant_bookable">Instant Bookable:</label>
+            <input type="checkbox" id="instant_bookable" name="instant_bookable" {% if result['instant_bookable'] %}checked{% endif %}><br>
+            <label for="neighbourhood_group">Neighbourhood Group:</label>
+            <select id="neighbourhood_group" name="neighbourhood_group">
+                <option value="Bronx" {% if result['neighbourhood group'] == 'Bronx' %}selected{% endif %}>Bronx</option>
+                <option value="Brooklyn" {% if result['neighbourhood group'] == 'Brooklyn' %}selected{% endif %}>Brooklyn</option>
+                <option value="Manhattan" {% if result['neighbourhood group'] == 'Manhattan' %}selected{% endif %}>Manhattan</option>
+                <option value="Queens" {% if result['neighbourhood group'] == 'Queens' %}selected{% endif %}>Queens</option>
+                <option value="Staten Island" {% if result['neighbourhood group'] == 'Staten Island' %}selected{% endif %}>Staten Island</option>
+                <option value="brookln" {% if result['neighbourhood group'] == 'brookln' %}selected{% endif %}>brookln</option>
+                <option value="manhatan" {% if result['neighbourhood group'] == 'manhatan' %}selected{% endif %}>manhatan</option>
+            </select><br>
+            <button type="submit">Mettre à jour</button>
+        </form>
+    </div>
+</body>
+</html>
