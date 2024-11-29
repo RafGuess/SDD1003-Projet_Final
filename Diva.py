@@ -68,11 +68,14 @@ def update():
 
 @app.route('/delete', methods=['POST'])
 def delete():
-    name = request.json.get('name')
+    name = request.form.get('name')
+    if not name:
+        return jsonify({'error': 'Le paramètre name est manquant'}), 400
+
     result = collection.delete_one({'NAME': name})
     if result.deleted_count:
         return jsonify({'message': 'Suppression réussie'})
-    return jsonify({'error': 'Échec de la suppression'}), 400
+    return jsonify({'error': 'Échec de la suppression, document non trouvé'}), 404
 
 # Fonctionnalité de graphiques
 @app.route('/graphs')
