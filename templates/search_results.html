@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #5a7e53;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #cccccc;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .container {
+            background: #253821;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+        }
+
+        .result {
+            background: #3a5a3a;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .result h2 {
+            margin: 0;
+            font-size: 1.2em;
+        }
+
+        .result p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Results</h1>
+    <div class="container">
+        {% for result in results %}
+        <div class="result">
+            <h2>{{ result['NAME'] }}</h2>
+            <p>Price: {{ result['price'] }}</p>
+            <p>Minimum Nights: {{ result['minimum nights'] }}</p>
+            <p>Instant Bookable: {{ result['instant_bookable'] }}</p>
+            <p>Neighbourhood Group: {{ result['neighbourhood group'] }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

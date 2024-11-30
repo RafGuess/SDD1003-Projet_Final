@@ -33,7 +33,7 @@ def search():
         query['instant_bookable'] = True
 
     results = list(collection.find(query, {'_id': 0, 'NAME': 1, 'price': 1, 'minimum nights': 1, 'instant_bookable': 1, 'neighbourhood group': 1}).sort('price', 1))
-    return jsonify(results)
+    return render_template('search_results.html', results=results)
 
 # Fonctionnalité de mise à jour
 @app.route('/search_update', methods=['GET'])
