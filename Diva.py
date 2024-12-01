@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, render_template
+import base64
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsClassifier
+import io
 
 app = Flask(__name__)
 
@@ -12,6 +14,16 @@ app = Flask(__name__)
 client = MongoClient('mongodb+srv://aguess1874:Alex.1874@cluster0.mr9n5.mongodb.net/')
 db = client['AirBnB']
 collection = db['AirBnB']
+
+'''
+Liste des champs:
+'_id', 'id', 'NAME', 'host id', 'host_identity_verified', 'host name', 'neighbourhood group', 'neighbourhood',
+'lat', 'long', 'country', 'country code', 'instant_bookable', 'cancellation_policy', 'room type', 'Construction year',
+'price', 'service fee', 'minimum nights', 'number of reviews', 'last review', 'reviews per month', 'review rate number',
+'calculated host listings count', 'availability 365', 'house_rules'
+
+
+'''
 
 @app.route('/')
 def index():
@@ -79,30 +91,51 @@ def delete():
 
 # Fonctionnalité de graphiques
 @app.route('/graphs')
+@app.route('/graphs')
 def graphs():
-    data = pd.DataFrame(list(collection.find({}, {'room type': 1, 'price': 1, 'minimum nights': 1, '_id': 0})))
+    data = pd.DataFrame(list(collection.find({}, {'room type': 1, 'minimum nights': 1, 'number of reviews': 1, 'date': 1, 'instant_bookable': 1, 'neighbourhood group': 1, '_id': 0})))
 
-    plt.figure(figsize=(10, 6))
-    data['room type'].value_counts().plot(kind='bar')
-    plt.title('Distribution des types de chambres')
-    plt.savefig('static/room_type_bar.png')
-    plt.close()
+    # Distribution des types de chambres
+    fig1, ax1 = plt.subplots(figsize=(10, 6))
+    data['room type'].value_counts().plot(kind='bar', ax=ax1, color='skyblue', edgecolor='black')
+    ax1.set_title('Distribution des types de chambres', fontsize=16)
+    ax1.set_xlabel('Type de chambre', fontsize=14)
+    ax1.set_ylabel('Nombre', fontsize=14)
+    ax1.grid(True, linestyle='--', alpha=0.7)
+    plt.xticks(rotation=45, ha='right')
+    img1 = io.BytesIO()
+    fig1.savefig(img1, format='png')
+    img1.seek(0)
+    graph1_url = base64.b64encode(img1.getvalue()).decode()
 
-    plt.figure(figsize=(10, 6))
-    data['price'] = data['price'].apply(lambda x: float(x.replace('$', '').strip()))
-    data['price'].plot(kind='hist', bins=50)
-    plt.title('Distribution des prix')
-    plt.savefig('static/price_hist.png')
-    plt.close()
+    # Distribution des nuits minimums
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    data['minimum nights'].plot(kind='hist', bins=50, ax=ax2, color='lightgreen', edgecolor='black')
+    ax2.set_title('Distribution des nuits minimums', fontsize=16)
+    ax2.set_xlabel('Nuits minimums', fontsize=14)
+    ax2.set_ylabel('Fréquence', fontsize=14)
+    ax2.grid(True, linestyle='--', alpha=0.7)
+    ax2.set_xlim(-10, 500)
+    img2 = io.BytesIO()
+    fig2.savefig(img2, format='png')
+    img2.seek(0)
+    graph2_url = base64.b64encode(img2.getvalue()).decode()
 
-    plt.figure(figsize=(10, 6))
-    data['minimum nights'].plot(kind='box')
-    plt.title('Distribution des nuits minimums')
-    plt.savefig('static/min_nights_box.png')
-    plt.close()
+    # Croisement instant_bookable et neighbourhood_group
+    fig3, ax3 = plt.subplots(figsize=(10, 6))
+    cross_tab = pd.crosstab(data['neighbourhood group'], data['instant_bookable'])
+    cross_tab.plot(kind='bar', ax=ax3, color=['lightcoral', 'lightblue'], edgecolor='black')
+    ax3.set_title('Instant Bookable vs Neighbourhood Group', fontsize=16)
+    ax3.set_xlabel('Neighbourhood Group', fontsize=14)
+    ax3.set_ylabel('Count', fontsize=14)
+    ax3.grid(True, linestyle='--', alpha=0.7)
+    plt.xticks(rotation=0, ha='right')
+    img3 = io.BytesIO()
+    fig3.savefig(img3, format='png')
+    img3.seek(0)
+    graph3_url = base64.b64encode(img3.getvalue()).decode()
 
-    return jsonify({'message': 'Graphiques créés'})
-
+    return render_template('graphs.html', graph1_url=graph1_url, graph2_url=graph2_url, graph3_url=graph3_url)
 # Algorithmes de machine learning
 @app.route('/ml')
 def ml():
