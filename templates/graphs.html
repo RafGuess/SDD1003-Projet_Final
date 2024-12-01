@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Graphs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #5a7e53;
+            margin: 0;
+            padding: 20px;
+            color: #cccccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .graph-container {
+            background: #253821;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Graphs</h1>
+    <div class="graph-container">
+        <h2>Distribution des types de chambres</h2>
+        <img src="data:image/png;base64,{{ graph1_url }}" alt="Distribution des types de chambres">
+    </div>
+    <div class="graph-container">
+        <h2>Distribution des nuits minimums</h2>
+        <img src="data:image/png;base64,{{ graph2_url }}" alt="Distribution des nuits minimums">
+    </div>
+    <div class="graph-container">
+        <h2>Instant Bookable vs Neighbourhood Group</h2>
+        <img src="data:image/png;base64,{{ graph3_url }}" alt="Instant Bookable vs Neighbourhood Group">
+    </div>
+</body>
+</html>
