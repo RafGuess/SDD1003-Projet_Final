@@ -5,9 +5,15 @@ from bson.objectid import ObjectId
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.neighbors import KNeighborsRegressor
 import io
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
 
+
+# Initialisation de l'application Flask
 app = Flask(__name__)
 
 # Connexion à MongoDB
@@ -21,10 +27,9 @@ Liste des champs:
 'lat', 'long', 'country', 'country code', 'instant_bookable', 'cancellation_policy', 'room type', 'Construction year',
 'price', 'service fee', 'minimum nights', 'number of reviews', 'last review', 'reviews per month', 'review rate number',
 'calculated host listings count', 'availability 365', 'house_rules'
-
-
 '''
 
+# Route pour la page d'accueil
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -32,10 +37,12 @@ def index():
 # Fonctionnalité de recherche
 @app.route('/search', methods=['GET'])
 def search():
+    # Récupération des paramètres de la requête
     min_nights = request.args.get('min_nights')
     neighbourhood_group = request.args.get('neighbourhood_group')
     instant_bookable = request.args.get('instant_bookable')
 
+    # Construction de la requête MongoDB
     query = {'price': {'$exists': True, '$ne': ''}}
     if min_nights:
         query['minimum nights'] = {'$gte': int(min_nights)}
@@ -44,24 +51,29 @@ def search():
     if instant_bookable:
         query['instant_bookable'] = True
 
+    # Exécution de la requête et récupération des résultats
     results = list(collection.find(query, {'_id': 0, 'NAME': 1, 'price': 1, 'minimum nights': 1, 'instant_bookable': 1, 'neighbourhood group': 1}).sort('price', 1))
     return render_template('search_results.html', results=results)
 
 # Fonctionnalité de mise à jour
 @app.route('/search_update', methods=['GET'])
 def search_update():
+    # Récupération du nom pour la mise à jour
     name = request.args.get('name')
     query = {'price': {'$exists': True, '$ne': ''}}
     if name:
         query['NAME'] = name
 
+    # Recherche du document correspondant
     result = collection.find_one(query, {'_id': 1, 'NAME': 1, 'price': 1, 'minimum nights': 1, 'instant_bookable': 1, 'neighbourhood group': 1})
     if result:
         return render_template('update.html', result=result)
     return jsonify({'error': 'Document non trouvé'}), 404
 
+# Route pour effectuer la mise à jour
 @app.route('/update', methods=['POST'])
 def update():
+    # Récupération des données du formulaire
     document_id = request.form.get('id')
     new_data = {}
     if request.form.get('price'):
@@ -73,26 +85,30 @@ def update():
     if request.form.get('neighbourhood_group'):
         new_data['neighbourhood group'] = request.form.get('neighbourhood_group')
 
+    # Mise à jour du document dans MongoDB
     result = collection.update_one({'_id': ObjectId(document_id)}, {'$set': new_data})
     if result.modified_count:
         return jsonify({'message': 'Mise à jour réussie'})
     return jsonify({'error': 'Échec de la mise à jour'}), 400
 
+# Route pour la suppression d'un document
 @app.route('/delete', methods=['POST'])
 def delete():
+    # Récupération du nom pour la suppression
     name = request.form.get('name')
     if not name:
         return jsonify({'error': 'Le paramètre name est manquant'}), 400
 
+    # Suppression du document dans MongoDB
     result = collection.delete_one({'NAME': name})
     if result.deleted_count:
         return jsonify({'message': 'Suppression réussie'})
     return jsonify({'error': 'Échec de la suppression, document non trouvé'}), 404
 
-# Fonctionnalité de graphiques
-@app.route('/graphs')
+# Fonctionnalité de génération de graphiques
 @app.route('/graphs')
 def graphs():
+    # Chargement des données depuis MongoDB
     data = pd.DataFrame(list(collection.find({}, {'room type': 1, 'minimum nights': 1, 'number of reviews': 1, 'date': 1, 'instant_bookable': 1, 'neighbourhood group': 1, '_id': 0})))
 
     # Distribution des types de chambres
@@ -136,39 +152,147 @@ def graphs():
     graph3_url = base64.b64encode(img3.getvalue()).decode()
 
     return render_template('graphs.html', graph1_url=graph1_url, graph2_url=graph2_url, graph3_url=graph3_url)
+
 # Algorithmes de machine learning
 @app.route('/ml')
 def ml():
-    data = pd.DataFrame(list(collection.find({}, {'price': 1, 'minimum nights': 1, 'number of reviews': 1, '_id': 0})))
-    data['price'] = data['price'].apply(lambda x: float(x.replace('$', '').strip()))
+    # Chargement des données depuis MongoDB
+    data = pd.DataFrame(list(collection.find({}, {'minimum nights': 1, 'number of reviews': 1, '_id': 0})))
+
+    # Prétraitement des données
+    data = data.dropna()
     X = data[['minimum nights', 'number of reviews']]
-    y = data['price']
+    y = np.random.rand(len(data))  # Variable cible factice pour la démonstration
 
-    # Régression linéaire
-    lr = LinearRegression()
-    lr.fit(X, y)
-    data['predicted_price'] = lr.predict(X)
+    # Division des données en ensembles d'entraînement et de test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Classification KNN
-    knn = KNeighborsClassifier(n_neighbors=5)
-    data['price_category'] = pd.cut(data['price'], bins=3, labels=['Bas', 'Moyen', 'Élevé'])
-    knn.fit(X, data['price_category'])
-    data['predicted_category'] = knn.predict(X)
+    # Entraînement du modèle de régression linéaire
+    model = LinearRegression()
+    model.fit(X_train, y_train)
 
-    return jsonify({'message': 'Machine learning appliqué'})
+    # Prédictions
+    predictions = model.predict(X_test)
+
+    # Évaluation du modèle
+    mse = mean_squared_error(y_test, predictions)
+    r2 = r2_score(y_test, predictions)
+
+    # Visualisation des résultats
+    plt.scatter(y_test, predictions)
+    plt.xlabel('Valeurs réelles')
+    plt.ylabel('Valeurs prédites')
+    plt.title('Valeurs réelles vs Valeurs prédites')
+    plt.show()
+
+    return jsonify({
+        'predictions': predictions.tolist(),
+        'mse': mse,
+        'r2': r2
+    })
+
+
+
+
+# Algorithmes de machine learning - KNN
+@app.route('/ml_knn')
+def ml_knn():
+    # Chargement des données depuis MongoDB
+    data = pd.DataFrame(list(collection.find({}, {'minimum nights': 1, 'number of reviews': 1, '_id': 0})))
+
+    # Prétraitement des données
+    data = data.dropna()
+    X = data[['minimum nights', 'number of reviews']]
+    y = np.random.rand(len(data))  # Variable cible factice pour la démonstration
+
+    # Division des données en ensembles d'entraînement et de test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Entraînement du modèle KNN
+    knn_model = KNeighborsRegressor(n_neighbors=5)
+    knn_model.fit(X_train, y_train)
+
+    # Prédictions
+    knn_predictions = knn_model.predict(X_test)
+
+    # Évaluation du modèle
+    knn_mse = mean_squared_error(y_test, knn_predictions)
+    knn_r2 = r2_score(y_test, knn_predictions)
+
+    # Visualisation des résultats
+    plt.scatter(y_test, knn_predictions)
+    plt.xlabel('Valeurs réelles')
+    plt.ylabel('Valeurs prédites')
+    plt.title('Valeurs réelles vs Valeurs prédites (KNN)')
+    plt.show()
+
+    return jsonify({
+        'predictions': knn_predictions.tolist(),
+        'mse': knn_mse,
+        'r2': knn_r2
+    })
+
+
+# Algorithmes de machine learning - Decision Tree Regression
+@app.route('/ml_decision_tree')
+def ml_decision_tree():
+    # Chargement des données depuis MongoDB
+    data = pd.DataFrame(list(collection.find({}, {'minimum nights': 1, 'number of reviews': 1, '_id': 0})))
+
+    # Prétraitement des données
+    data = data.dropna()
+    X = data[['minimum nights', 'number of reviews']]
+    y = np.random.rand(len(data))  # Variable cible factice pour la démonstration
+
+    # Division des données en ensembles d'entraînement et de test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Entraînement du modèle Decision Tree Regression
+    dt_model = DecisionTreeRegressor()
+    dt_model.fit(X_train, y_train)
+
+    # Prédictions
+    dt_predictions = dt_model.predict(X_test)
+
+    # Évaluation du modèle
+    dt_mse = mean_squared_error(y_test, dt_predictions)
+    dt_r2 = r2_score(y_test, dt_predictions)
+
+    # Visualisation des résultats
+    plt.scatter(y_test, dt_predictions)
+    plt.xlabel('Valeurs réelles')
+    plt.ylabel('Valeurs prédites')
+    plt.title('Valeurs réelles vs Valeurs prédites (Decision Tree)')
+    plt.show()
+
+    return jsonify({
+        'predictions': dt_predictions.tolist(),
+        'mse': dt_mse,
+        'r2': dt_r2
+    })
 
 # Classification de document
-@app.route('/classify/<id>', methods=['GET'])
-def classify(id):
-    document = collection.find_one({'_id': ObjectId(id)})
+# Classification de document
+# Classification de document
+@app.route('/classify', methods=['GET'])
+def classify():
+    # Récupération du nom du document à classifier
+    name = request.args.get('name')
+    if not name:
+        return jsonify({'error': 'Le paramètre name est manquant'}), 400
+
+    # Recherche du document par nom
+    document = collection.find_one({'NAME': name})
     if document:
-        price = float(document.get('price', '0').replace('$', '').strip())
-        if price > 100:
-            classification = 'Cher'
+        # Classification basée sur le nombre de reviews
+        number_of_reviews = document.get('number of reviews', 0)
+        if number_of_reviews > 50:
+            classification = 'Populaire'
         else:
-            classification = 'Abordable'
-        return jsonify({'id': str(document['_id']), 'NAME': document.get('NAME', ''), 'classification': classification})
+            classification = 'Moins populaire'
+        return jsonify({'name': document.get('NAME', ''), 'classification': classification})
     return jsonify({'error': 'Document non trouvé'}), 404
 
+# Démarrage de l'application Flask
 if __name__ == '__main__':
     app.run(debug=True)

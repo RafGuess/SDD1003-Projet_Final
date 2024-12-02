@@ -2,130 +2,140 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flask App</title>
+    <title>AirBnB Data Analysis</title>
     <style>
-    body {
-    font-family: Arial, sans-serif;
-    background-color: #5a7e53;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 200px;
-    margin-top: 100px; /* Add margin to shift the entire page down */
-}
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #5a7e53;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 200px;
+            margin-top: 100px; /* Add margin to shift the entire page down */
+        }
 
-    .container {
-        display: flex;
-        width: 100%;
-        max-width: 1200px;
-        margin-top: 100px; /* Add margin to avoid content being hidden behind the fixed header */
-    }
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 100px; /* Add margin to avoid content being hidden behind the fixed header */
+        }
 
-    .sidebar {
-        border-radius: 5%;
-        background-color: #253821;
-        color: white;
-        padding: 20px;
-        width: 200px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+        .sidebar {
+            border-radius: 5%;
+            background-color: #253821;
+            color: white;
+            padding: 20px;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .sidebar button {
-        background-color: #5a7e53;
-        color: #cccccc;
-        padding: 10px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        margin: 10px 0;
-        width: 100%;
-        text-align: center;
-    }
+        .sidebar button {
+            background-color: #5a7e53;
+            color: #cccccc;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            width: 100%;
+            text-align: center;
+        }
 
-    .sidebar button:hover {
-        background-color: #486745;
-    }
+        .sidebar button:hover {
+            background-color: #486745;
+        }
 
-    .content {
-        flex: 1;
-        padding: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-    }
+        .content {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
 
-    h1, h2 {
-        color: #cccccc;
-        text-align: center;
-    }
+        h1, h2 {
+            color: #cccccc;
+            text-align: center;
+        }
 
-    h1 {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 55%;
-    background-color: #5a7e53;
-    margin: 0 auto;
-    margin-top: 20px;
-    padding: 40px 0;
-    z-index: 1000;
-    text-align: center;
-    border: 5px solid #253821;
-    border-sizing: border-box;
-    border-radius: 10px;
-    background-color: #253821;
-    }
+        h1 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 55%;
+            background-color: #5a7e53;
+            margin: 0 auto;
+            margin-top: 20px;
+            padding: 40px 0;
+            z-index: 1000;
+            text-align: center;
+            border: 5px solid #253821;
+            border-sizing: border-box;
+            border-radius: 10px;
+            background-color: #253821;
+        }
 
-    form {
-        background: #253821;
-        padding: 20px;
-        margin: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 500px;
-        display: none;
-        color: #cccccc;
-    }
+        form {
+            background: #253821;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            display: none;
+            color: #cccccc;
+        }
 
-    label {
-        display: block;
-        font-weight: bold;
-        margin: 0 auto;
-        margin-bottom: 5px;
-        width: 55%;
-    }
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 0 auto;
+            margin-bottom: 5px;
+            width: 55%;
+        }
 
-    input[type="text"], input[type="number"], input[type="checkbox"], select {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        width: 55%;
-        display: block;
-        margin: 0 auto;
-    }
+        input[type="text"], input[type="number"], input[type="checkbox"], select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 55%;
+            display: block;
+            margin: 0 auto;
+        }
 
-    button[type="submit"] {
-        background-color: #5a7e53;
-        color: #cccccc;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        width: 25%;
-        display: block;
-        margin: 0 auto;
-    }
+        button[type="submit"] {
+            background-color: #5a7e53;
+            color: #cccccc;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 25%;
+            display: block;
+            margin: 0 auto;
+        }
 
-    button[type="submit"]:hover {
-        background-color: #486745;
-    }
-</style>
+        button[type="submit"]:hover {
+            background-color: #486745;
+        }
+
+        .ml-buttons {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ml-buttons button {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <div>
@@ -136,8 +146,13 @@
             <button class="toggle-button" onclick="toggleForm('searchForm')">Recherche</button>
             <button class="toggle-button" onclick="toggleForm('searchUpdateForm')">Mise à jour</button>
             <button class="toggle-button" onclick="toggleForm('deleteForm')">Suppression</button>
-            <button class="toggle-button" onclick="toggleForm('graphsForm')">Visualitation</button>
-            <button class="toggle-button" onclick="toggleForm('mlForm')">Machine Learning</button>
+            <button class="toggle-button" onclick="toggleForm('graphsForm')">Visualisation</button>
+            <button class="toggle-button" onclick="toggleMlButtons()">Machine Learning</button>
+            <div class="ml-buttons" id="mlButtons">
+                <button class="toggle-button" onclick="toggleForm('mlForm')">Linear Regression</button>
+                <button class="toggle-button" onclick="toggleForm('mlKnnForm')">KNN</button>
+                <button class="toggle-button" onclick="toggleForm('mlDecisionTreeForm')">Decision Tree</button>
+            </div>
             <button class="toggle-button" onclick="toggleForm('classifyForm')">Classifier un document</button>
         </div>
         <div class="content">
@@ -176,12 +191,20 @@
             </form>
 
             <form id="mlForm" action="/ml" method="get">
-                <button type="submit">Apply Machine Learning</button>
+                <button type="submit">Apply Linear Regression</button>
+            </form>
+
+            <form id="mlKnnForm" action="/ml_knn" method="get">
+                <button type="submit">Apply Machine Learning KNN</button>
+            </form>
+
+            <form id="mlDecisionTreeForm" action="/ml_decision_tree" method="get">
+                <button type="submit">Apply Machine Learning Decision Tree</button>
             </form>
 
             <form id="classifyForm" action="/classify" method="get">
-                <label for="id">ID:</label>
-                <input type="text" id="id" name="id"><br>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name"><br>
                 <button type="submit">Classify</button>
             </form>
         </div>
@@ -200,6 +223,15 @@
                 currentForm = form;
             } else {
                 currentForm = null;
+            }
+        }
+
+        function toggleMlButtons() {
+            const mlButtons = document.getElementById('mlButtons');
+            if (mlButtons.style.display === "none" || mlButtons.style.display === "") {
+                mlButtons.style.display = "flex";
+            } else {
+                mlButtons.style.display = "none";
             }
         }
 
