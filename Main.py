@@ -1,3 +1,5 @@
+# Projet fait par Abderraouf Zoubir Guessoum
+
 from flask import Flask, request, jsonify, render_template
 import base64
 from pymongo import MongoClient
