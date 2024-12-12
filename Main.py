@@ -272,8 +272,6 @@ def ml_decision_tree():
     })
 
 # Classification de document
-# Classification de document
-# Classification de document
 @app.route('/classify', methods=['GET'])
 def classify():
     # Récupération du nom du document à classifier
